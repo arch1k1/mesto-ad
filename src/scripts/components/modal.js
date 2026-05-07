@@ -1,16 +1,18 @@
 const handleEscUp = (evt) => {
   if (evt.key === "Escape") {
     const activePopup = document.querySelector(".popup_is-opened");
-    closeModalWindow(activePopup);
+    if (activePopup) closeModalWindow(activePopup);
   }
 };
 
 export const openModalWindow = (modalWindow) => {
+  if (!modalWindow) return;
   modalWindow.classList.add("popup_is-opened");
   document.addEventListener("keyup", handleEscUp);
 };
 
 export const closeModalWindow = (modalWindow) => {
+  if (!modalWindow) return;
   modalWindow.classList.remove("popup_is-opened");
   document.removeEventListener("keyup", handleEscUp);
 };
