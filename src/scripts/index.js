@@ -33,6 +33,10 @@ const cardNameInput = cardForm.querySelector(".popup__input_type_card-name");
 const cardLinkInput = cardForm.querySelector(".popup__input_type_url");
 const cardSubmitButton = cardForm.querySelector(".popup__button");
 
+const removeCardModalWindow = document.querySelector(".popup_type_remove-card");
+const removeCardForm = removeCardModalWindow?.querySelector(".popup__form");
+const removeCardSubmitButton = removeCardModalWindow?.querySelector(".popup__button");
+
 const imageModalWindow = document.querySelector(".popup_type_image");
 const imageElement = imageModalWindow.querySelector(".popup__image");
 const imageCaption = imageModalWindow.querySelector(".popup__caption");
@@ -67,6 +71,7 @@ const validationConfig = {
 };
 
 let currentUserId = null;
+let pendingRemove = null;
 
 const renderLoading = (isLoading, buttonElement, { defaultText, loadingText }) => {
   if (!buttonElement) return;
@@ -186,13 +191,11 @@ const handleLike = ({ cardId, isLiked, likeButton, likeCountElement }) => {
 };
 
 const handleDelete = ({ cardId, cardElement }) => {
-  removeCard(cardId)
-    .then(() => {
-      deleteCard(cardElement);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  pendingRemove = { cardId, cardElement };
+  if (removeCardForm) {
+    resetValidation(removeCardForm, validationConfig);
+  }
+  openModalWindow(removeCardModalWindow);
 };
 
 const renderCard = (cardData, method = "append") => {
@@ -234,6 +237,28 @@ const handleCardFormSubmit = (evt) => {
 profileForm.addEventListener("submit", handleProfileFormSubmit);
 cardForm.addEventListener("submit", handleCardFormSubmit);
 avatarForm.addEventListener("submit", handleAvatarFromSubmit);
+if (removeCardForm) {
+  removeCardForm.addEventListener("submit", (evt) => {
+    evt.preventDefault();
+    if (!pendingRemove) return;
+
+    const { cardId, cardElement } = pendingRemove;
+    renderLoading(true, removeCardSubmitButton, { defaultText: "Да", loadingText: "Удаление..." });
+
+    removeCard(cardId)
+      .then(() => {
+        deleteCard(cardElement);
+        closeModalWindow(removeCardModalWindow);
+        pendingRemove = null;
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        renderLoading(false, removeCardSubmitButton, { defaultText: "Да", loadingText: "Удаление..." });
+      });
+  });
+}
 
 openProfileFormButton.addEventListener("click", () => {
   profileTitleInput.value = profileTitle.textContent;

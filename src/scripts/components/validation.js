@@ -28,7 +28,20 @@ const toggleButtonState = (inputList, buttonElement, config) => {
   }
 };
 
+const setCustomValidityMessage = (inputElement) => {
+  if (!inputElement) return;
+
+  // Prefer custom message for pattern mismatch if provided on the input.
+  if (inputElement.validity.patternMismatch && inputElement.dataset?.errorMessage) {
+    inputElement.setCustomValidity(inputElement.dataset.errorMessage);
+    return;
+  }
+
+  inputElement.setCustomValidity("");
+};
+
 const checkInputValidity = (formElement, inputElement, config) => {
+  setCustomValidityMessage(inputElement);
   if (!inputElement.validity.valid) {
     showInputError(formElement, inputElement, config);
   } else {
