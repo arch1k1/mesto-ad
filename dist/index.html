@@ -7,15 +7,15 @@
       content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
     />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Mesto</title>
-    <script type="module" crossorigin src="/assets/index-CrrLLsLm.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-SnSEsTOT.css">
+    <title>Mesto</title>
+    <script type="module" crossorigin src="./assets/index-CVEPwfRB.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DKwl_nIp.css">
   </head>
   <body class="page">
     <div class="page__content">
       <header class="header page__section">
         <img
-          src="/assets/logo-C_QQpFK1.svg"
+          src="./assets/logo-DQ1BIEMY.svg"
           alt="Логотип проекта место"
           class="logo header__logo"
         />
@@ -59,6 +59,7 @@
                 placeholder="Имя"
                 minlength="2"
                 maxlength="40"
+                pattern="[A-Za-zА-Яа-яЁё\\-\\s]+"
                 required
                 data-error-message="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
               />
@@ -105,7 +106,7 @@
                 placeholder="Название"
                 minlength="2"
                 maxlength="30"
-                pattern="[A-Za-zА-Яа-яЁё\s]+"
+                pattern="[A-Za-zА-Яа-яЁё\\-\\s]+"
                 required
                 data-error-message="Разрешены только латинские, кириллические буквы и пробелы"
               />
@@ -190,7 +191,7 @@
           <ul class="popup__list"></ul>
         </div>
       </div>
-    </div>
+    </div>
 
     <template id="card-template">
       <li class="places__item card">

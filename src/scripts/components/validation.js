@@ -18,13 +18,23 @@ const hideInputError = (formElement, inputElement, config) => {
 
 const hasInvalidInput = (inputList) => inputList.some((inputElement) => !inputElement.validity.valid);
 
+const disableSubmitButton = (buttonElement, config) => {
+  if (!buttonElement) return;
+  buttonElement.disabled = true;
+  buttonElement.classList.add(config.inactiveButtonClass);
+};
+
+const enableSubmitButton = (buttonElement, config) => {
+  if (!buttonElement) return;
+  buttonElement.disabled = false;
+  buttonElement.classList.remove(config.inactiveButtonClass);
+};
+
 const toggleButtonState = (inputList, buttonElement, config) => {
   if (hasInvalidInput(inputList)) {
-    buttonElement.disabled = true;
-    buttonElement.classList.add(config.inactiveButtonClass);
+    disableSubmitButton(buttonElement, config);
   } else {
-    buttonElement.disabled = false;
-    buttonElement.classList.remove(config.inactiveButtonClass);
+    enableSubmitButton(buttonElement, config);
   }
 };
 
@@ -68,7 +78,7 @@ export const enableValidation = (config) => {
   formList.forEach((formElement) => setEventListeners(formElement, config));
 };
 
-export const resetValidation = (formElement, config) => {
+export const clearValidation = (formElement, config) => {
   const inputList = Array.from(formElement.querySelectorAll(config.inputSelector));
   const buttonElement = formElement.querySelector(config.submitButtonSelector);
 

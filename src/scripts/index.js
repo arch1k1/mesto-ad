@@ -6,7 +6,7 @@
   Из index.js не допускается что то экспортировать
 */
 
-import { createCardElement, deleteCard } from "./components/card.js";
+import { createCardElement, deleteCard, updateCardLikeView } from "./components/card.js";
 import { openModalWindow, closeModalWindow, setCloseModalWindowEventListeners } from "./components/modal.js";
 import {
   getUserInfo,
@@ -17,7 +17,7 @@ import {
   removeCard,
   changeLikeCardStatus,
 } from "./components/api.js";
-import { enableValidation, resetValidation } from "./components/validation.js";
+import { enableValidation, clearValidation } from "./components/validation.js";
 
 // DOM узлы
 const placesWrap = document.querySelector(".places__list");
@@ -153,20 +153,20 @@ const handleInfoClick = (cardId) => {
         return Promise.reject("Карточка не найдена");
       }
 
-      cardInfoTitle.textContent = cardData.name;
+      cardInfoTitle.textContent = "Информация о карточке";
 
       cardInfoModalInfoList.innerHTML = "";
       cardInfoLikesList.innerHTML = "";
 
+      const likes = cardData.likes ?? [];
       cardInfoModalInfoList.append(
-        createInfoString("Автор:", cardData.owner?.name ?? "—"),
+        createInfoString("Описание:", cardData.name ?? "—"),
         createInfoString("Дата создания:", formatDate(new Date(cardData.createdAt))),
-        createInfoString("Ссылка:", cardData.link),
-        createInfoString("Лайков:", String(cardData.likes?.length ?? 0))
+        createInfoString("Владелец:", cardData.owner?.name ?? "—"),
+        createInfoString("Количество лайков:", String(likes.length))
       );
 
-      const likes = cardData.likes ?? [];
-      cardInfoLikesTitle.textContent = likes.length ? "Лайкнули:" : "Лайков пока нет";
+      cardInfoLikesTitle.textContent = "Лайкнули:";
       likes.forEach((user) => {
         cardInfoLikesList.append(createUserPreview(user.name));
       });
@@ -182,8 +182,12 @@ const handleLike = ({ cardId, isLiked, likeButton, likeCountElement }) => {
   changeLikeCardStatus(cardId, isLiked)
     .then((updatedCard) => {
       const likedNow = Boolean(updatedCard.likes?.some((user) => user._id === currentUserId));
-      likeButton.classList.toggle("card__like-button_is-active", likedNow);
-      if (likeCountElement) likeCountElement.textContent = updatedCard.likes?.length ?? 0;
+      updateCardLikeView({
+        likeButton,
+        likeCountElement,
+        isLiked: likedNow,
+        likesCount: updatedCard.likes?.length ?? 0,
+      });
     })
     .catch((err) => {
       console.log(err);
@@ -193,7 +197,7 @@ const handleLike = ({ cardId, isLiked, likeButton, likeCountElement }) => {
 const handleDelete = ({ cardId, cardElement }) => {
   pendingRemove = { cardId, cardElement };
   if (removeCardForm) {
-    resetValidation(removeCardForm, validationConfig);
+    clearValidation(removeCardForm, validationConfig);
   }
   openModalWindow(removeCardModalWindow);
 };
@@ -223,7 +227,7 @@ const handleCardFormSubmit = (evt) => {
       renderCard(cardData, "prepend");
       closeModalWindow(cardFormModalWindow);
       cardForm.reset();
-      resetValidation(cardForm, validationConfig);
+      clearValidation(cardForm, validationConfig);
     })
     .catch((err) => {
       console.log(err);
@@ -263,19 +267,19 @@ if (removeCardForm) {
 openProfileFormButton.addEventListener("click", () => {
   profileTitleInput.value = profileTitle.textContent;
   profileDescriptionInput.value = profileDescription.textContent;
-  resetValidation(profileForm, validationConfig);
+  clearValidation(profileForm, validationConfig);
   openModalWindow(profileFormModalWindow);
 });
 
 profileAvatar.addEventListener("click", () => {
   avatarForm.reset();
-  resetValidation(avatarForm, validationConfig);
+  clearValidation(avatarForm, validationConfig);
   openModalWindow(avatarFormModalWindow);
 });
 
 openCardFormButton.addEventListener("click", () => {
   cardForm.reset();
-  resetValidation(cardForm, validationConfig);
+  clearValidation(cardForm, validationConfig);
   openModalWindow(cardFormModalWindow);
 });
 
