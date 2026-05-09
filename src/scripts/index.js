@@ -72,6 +72,22 @@ const validationConfig = {
 
 let currentUserId = null;
 let pendingRemove = null;
+let profileFormBaseline = { name: "", about: "" };
+
+const setFormSubmitEnabled = (buttonElement, enabled) => {
+  if (!buttonElement) return;
+  buttonElement.disabled = !enabled;
+  buttonElement.classList.toggle(validationConfig.inactiveButtonClass, !enabled);
+};
+
+const syncProfileSubmitButtonState = () => {
+  const inputs = [profileTitleInput, profileDescriptionInput];
+  const hasInvalid = inputs.some((inputElement) => !inputElement.validity.valid);
+  const unchanged =
+    profileTitleInput.value === profileFormBaseline.name &&
+    profileDescriptionInput.value === profileFormBaseline.about;
+  setFormSubmitEnabled(profileSubmitButton, !hasInvalid && !unchanged);
+};
 
 const renderLoading = (isLoading, buttonElement, { defaultText, loadingText }) => {
   if (!buttonElement) return;
@@ -97,9 +113,7 @@ const handleProfileFormSubmit = (evt) => {
       profileDescription.textContent = userData.about;
       closeModalWindow(profileFormModalWindow);
     })
-    .catch((err) => {
-      console.log(err);
-    })
+    .catch(() => {})
     .finally(() => {
       renderLoading(false, profileSubmitButton, { defaultText: "Сохранить", loadingText: "Сохранение..." });
     });
@@ -113,9 +127,7 @@ const handleAvatarFromSubmit = (evt) => {
       profileAvatar.style.backgroundImage = `url(${userData.avatar})`;
       closeModalWindow(avatarFormModalWindow);
     })
-    .catch((err) => {
-      console.log(err);
-    })
+    .catch(() => {})
     .finally(() => {
       renderLoading(false, avatarSubmitButton, { defaultText: "Сохранить", loadingText: "Сохранение..." });
     });
@@ -155,8 +167,8 @@ const handleInfoClick = (cardId) => {
 
       cardInfoTitle.textContent = "Информация о карточке";
 
-      cardInfoModalInfoList.innerHTML = "";
-      cardInfoLikesList.innerHTML = "";
+      cardInfoModalInfoList.replaceChildren();
+      cardInfoLikesList.replaceChildren();
 
       const likes = cardData.likes ?? [];
       cardInfoModalInfoList.append(
@@ -173,9 +185,7 @@ const handleInfoClick = (cardId) => {
 
       openModalWindow(cardInfoModalWindow);
     })
-    .catch((err) => {
-      console.log(err);
-    });
+    .catch(() => {});
 };
 
 const handleLike = ({ cardId, isLiked, likeButton, likeCountElement }) => {
@@ -189,9 +199,7 @@ const handleLike = ({ cardId, isLiked, likeButton, likeCountElement }) => {
         likesCount: updatedCard.likes?.length ?? 0,
       });
     })
-    .catch((err) => {
-      console.log(err);
-    });
+    .catch(() => {});
 };
 
 const handleDelete = ({ cardId, cardElement }) => {
@@ -229,9 +237,7 @@ const handleCardFormSubmit = (evt) => {
       cardForm.reset();
       clearValidation(cardForm, validationConfig);
     })
-    .catch((err) => {
-      console.log(err);
-    })
+    .catch(() => {})
     .finally(() => {
       renderLoading(false, cardSubmitButton, { defaultText: "Создать", loadingText: "Создание..." });
     });
@@ -255,9 +261,7 @@ if (removeCardForm) {
         closeModalWindow(removeCardModalWindow);
         pendingRemove = null;
       })
-      .catch((err) => {
-        console.log(err);
-      })
+      .catch(() => {})
       .finally(() => {
         renderLoading(false, removeCardSubmitButton, { defaultText: "Да", loadingText: "Удаление..." });
       });
@@ -267,7 +271,12 @@ if (removeCardForm) {
 openProfileFormButton.addEventListener("click", () => {
   profileTitleInput.value = profileTitle.textContent;
   profileDescriptionInput.value = profileDescription.textContent;
+  profileFormBaseline = {
+    name: profileTitle.textContent,
+    about: profileDescription.textContent,
+  };
   clearValidation(profileForm, validationConfig);
+  syncProfileSubmitButtonState();
   openModalWindow(profileFormModalWindow);
 });
 
@@ -285,6 +294,10 @@ openCardFormButton.addEventListener("click", () => {
 
 enableValidation(validationConfig);
 
+[profileTitleInput, profileDescriptionInput].forEach((inputElement) => {
+  inputElement.addEventListener("input", syncProfileSubmitButtonState);
+});
+
 Promise.all([getCardList(), getUserInfo()])
   .then(([cards, userData]) => {
     currentUserId = userData._id;
@@ -296,9 +309,7 @@ Promise.all([getCardList(), getUserInfo()])
       renderCard(cardData, "append");
     });
   })
-  .catch((err) => {
-    console.log(err);
-  });
+  .catch(() => {});
 
 //настраиваем обработчики закрытия попапов
 const allPopups = document.querySelectorAll(".popup");
