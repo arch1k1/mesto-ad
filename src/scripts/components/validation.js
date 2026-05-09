@@ -1,9 +1,9 @@
-const showInputError = (formElement, inputElement, config) => {
+const showInputError = (formElement, inputElement, config, errorMessage) => {
   const errorElement = formElement.querySelector(`#${inputElement.id}-error`);
   if (!errorElement) return;
 
   inputElement.classList.add(config.inputErrorClass);
-  errorElement.textContent = inputElement.validationMessage;
+  errorElement.textContent = errorMessage;
   errorElement.classList.add(config.errorClass);
 };
 
@@ -38,22 +38,13 @@ const toggleButtonState = (inputList, buttonElement, config) => {
   }
 };
 
-const setCustomValidityMessage = (inputElement) => {
-  if (!inputElement) return;
-
-  // Prefer custom message for pattern mismatch if provided on the input.
-  if (inputElement.validity.patternMismatch && inputElement.dataset?.errorMessage) {
-    inputElement.setCustomValidity(inputElement.dataset.errorMessage);
-    return;
-  }
-
-  inputElement.setCustomValidity("");
-};
-
 const checkInputValidity = (formElement, inputElement, config) => {
-  setCustomValidityMessage(inputElement);
   if (!inputElement.validity.valid) {
-    showInputError(formElement, inputElement, config);
+    const errorMessage =
+      inputElement.validity.patternMismatch && inputElement.dataset?.errorMessage
+        ? inputElement.dataset.errorMessage
+        : inputElement.validationMessage;
+    showInputError(formElement, inputElement, config, errorMessage);
   } else {
     hideInputError(formElement, inputElement, config);
   }

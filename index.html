@@ -58,7 +58,7 @@
                 placeholder="Имя"
                 minlength="2"
                 maxlength="40"
-                pattern="[A-Za-zА-Яа-яЁё\\-\\s]+"
+                pattern="^[a-zA-Zа-яА-ЯёЁ\- ]+$"
                 required
                 data-error-message="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
               />
@@ -105,9 +105,9 @@
                 placeholder="Название"
                 minlength="2"
                 maxlength="30"
-                pattern="[A-Za-zА-Яа-яЁё\\-\\s]+"
+                pattern="^[a-zA-Zа-яА-ЯёЁ\- ]+$"
                 required
-                data-error-message="Разрешены только латинские, кириллические буквы и пробелы"
+                data-error-message="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
               />
               <span class="popup__error" id="place-name-error"></span>
             </label>
