@@ -77,7 +77,11 @@ let profileFormBaseline = { name: "", about: "" };
 const setFormSubmitEnabled = (buttonElement, enabled) => {
   if (!buttonElement) return;
   buttonElement.disabled = !enabled;
-  buttonElement.classList.toggle(validationConfig.inactiveButtonClass, !enabled);
+  if (enabled) {
+    buttonElement.classList.remove(validationConfig.inactiveButtonClass);
+  } else {
+    buttonElement.classList.add(validationConfig.inactiveButtonClass);
+  }
 };
 
 const syncProfileSubmitButtonState = () => {
@@ -295,7 +299,9 @@ openCardFormButton.addEventListener("click", () => {
 enableValidation(validationConfig);
 
 [profileTitleInput, profileDescriptionInput].forEach((inputElement) => {
-  inputElement.addEventListener("input", syncProfileSubmitButtonState);
+  inputElement.addEventListener("input", () => {
+    queueMicrotask(syncProfileSubmitButtonState);
+  });
 });
 
 Promise.all([getCardList(), getUserInfo()])
